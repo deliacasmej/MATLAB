@@ -1,0 +1,124 @@
+classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure  matlab.ui.Figure
+        Button    matlab.ui.control.Button
+        UIAxes    matlab.ui.control.UIAxes
+    end
+
+    
+    properties (Access = private)
+        dir = 0;
+        score = 0;
+    end
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: Button
+        function ButtonPushed(app, event)
+            dim = 16;
+            app.score = 0;
+            app.dir = 0;
+            cla(app.UIAxes)
+
+            v = .9;
+            f = [0 0];
+            f(1) = round(rand*dim);
+            f(2) = round(rand*dim);
+
+            s = zeros(100,2);
+            s(1,1)= round(dim/2);
+            s(1,2)= round(dim/2);
+            s(2,1)= 5;
+            s(2,2)= 6;
+
+            snake = plot(app.UIAxes, s([1 2], 1),s([1 2], 2), 'Marker',"." , "MarkerSize",20, "LineStyle","-", "LineWidth",10,"Color", #4CCB32)
+            hold(app.UIAxes, 'on')
+            food = plot(app.UIAxes, f(1 , 1),f(1 , 2), 'Marker',"." , "MarkerFaceColor",'r')
+
+            xlim(app.UIAxes, [0 20])
+            ylim(app.UIAxes, [0 20])
+
+            while(1)
+
+                id = 0;
+                s_old = s;
+
+                if(app.dir==0)
+                    s(1,1)=s_old(1,1)-1;
+                    s(1,2) = s_old(1,2);
+                elseif(app.dir==1)
+                    s(1,1)=s_old(1,1);
+                    s(1,2) = s_old(1,2)+1;
+                elseif(app.dir==2)
+                    s(1,1)=s_old(1,1)+1;
+                    s(1,2) = s_old(1,2);
+                elseif(app.dir==3)
+                    s(1,1)=s_old(1,1);
+                    s(1,2) = s_old(1,2)-1;
+                end
+
+                %Update Body
+           end
+
+
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 640 480];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            title(app.UIAxes, 'Title')
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            zlabel(app.UIAxes, 'Z')
+            app.UIAxes.Position = [38 12 545 433];
+
+            % Create Button
+            app.Button = uibutton(app.UIFigure, 'push');
+            app.Button.ButtonPushedFcn = createCallbackFcn(app, @ButtonPushed, true);
+            app.Button.Position = [262 443 100 23];
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
